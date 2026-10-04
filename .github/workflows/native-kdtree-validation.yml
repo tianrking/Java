@@ -1,0 +1,52 @@
+name: KDTree native validation
+
+on:
+  push:
+    branches:
+      - codex/native-kdtree-validation
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_OPTS: -Xmx2g
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6.0.1
+        with:
+          java-version: 21
+          distribution: temurin
+      - name: Record unchanged production and regression source
+        run: |
+          java -version
+          mvn --version
+          git rev-parse HEAD
+          git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java
+          git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = 5190e82f74ef4aac7079f4df13329e38881473d0
+          test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = dbc25c4af0843715d005306fc73f8214f222a537
+      - name: Native original KDTree regressions
+        run: mvn --batch-mode -Dtest=KDTreeTest,KDTreeDeletionTest test
+      - name: Install project formatter
+        if: always()
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y clang-format-16
+      - name: Check regression formatting
+        if: always()
+        run: |
+          clang-format-16 --version
+          clang-format-16 --style=file src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java > formatted-KDTreeDeletionTest.java
+          diff -u src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java formatted-KDTreeDeletionTest.java
+      - name: Save native test reports and formatter output
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: native-kdtree-reports
+          path: |
+            target/surefire-reports/
+            formatted-KDTreeDeletionTest.java
