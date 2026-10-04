@@ -19,7 +19,7 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
-      - name: Record unchanged production and regression source
+      - name: Record fixed production and regression source
         run: |
           java -version
           mvn --version
@@ -27,26 +27,52 @@ jobs:
           git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java
           git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = 5190e82f74ef4aac7079f4df13329e38881473d0
+          test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = f2bab248ff2861e40bf88a1f96dd3e64ae42e2e5
           test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = dbc25c4af0843715d005306fc73f8214f222a537
-      - name: Native original KDTree regressions
+      - name: Native fixed KDTree regressions
         run: mvn --batch-mode -Dtest=KDTreeTest,KDTreeDeletionTest test
+      - name: Full Maven verification
+        if: always()
+        run: mvn --batch-mode --update-snapshots verify
+      - name: Checkstyle
+        if: always()
+        run: mvn --batch-mode checkstyle:check
+      - name: SpotBugs
+        if: always()
+        run: mvn --batch-mode spotbugs:check
+      - name: PMD
+        if: always()
+        run: mvn --batch-mode pmd:check
       - name: Install project formatter
         if: always()
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y clang-format-16
-      - name: Check regression formatting
+      - name: Project Java source formatting
         if: always()
         run: |
           clang-format-16 --version
-          clang-format-16 --style=file src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java > formatted-KDTreeDeletionTest.java
-          diff -u src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java formatted-KDTreeDeletionTest.java
-      - name: Save native test reports and formatter output
+          find src -name '*.java' -print0 | xargs -0 clang-format-16 --dry-run --Werror --style=file
+      - name: Project structure
+        if: always()
+        run: python3 .github/workflows/scripts/check_structure.py
+      - name: Verify final native source
+        if: always()
+        run: |
+          git rev-parse HEAD
+          git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java
+          git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = f2bab248ff2861e40bf88a1f96dd3e64ae42e2e5
+          test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = dbc25c4af0843715d005306fc73f8214f222a537
+          git diff --exit-code HEAD -- .
+      - name: Save native test and quality reports
         if: always()
         uses: actions/upload-artifact@v6
         with:
           name: native-kdtree-reports
           path: |
             target/surefire-reports/
-            formatted-KDTreeDeletionTest.java
+            target/checkstyle-result.xml
+            target/spotbugsXml.xml
+            target/pmd.xml
