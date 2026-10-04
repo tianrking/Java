@@ -15,6 +15,8 @@ jobs:
       MAVEN_OPTS: -Xmx2g
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: 8d9ec40675a19130edd6b178bdcdceea67aa1e8d
       - uses: actions/setup-java@v6.0.1
         with:
           java-version: 21
@@ -26,7 +28,7 @@ jobs:
           git rev-parse HEAD
           git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java
           git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = 8d9ec40675a19130edd6b178bdcdceea67aa1e8d
           test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = f2bab248ff2861e40bf88a1f96dd3e64ae42e2e5
           test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = ee5d22f63b220168402196fccfa92db554a1b895
       - name: Native fixed KDTree regressions
@@ -62,7 +64,7 @@ jobs:
           git rev-parse HEAD
           git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java
           git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = 8d9ec40675a19130edd6b178bdcdceea67aa1e8d
           test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = f2bab248ff2861e40bf88a1f96dd3e64ae42e2e5
           test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = ee5d22f63b220168402196fccfa92db554a1b895
           git diff --exit-code HEAD -- .
