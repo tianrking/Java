@@ -1,15 +1,10 @@
 package com.thealgorithms.datastructures.trees;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class KDTreeDeletionTest {
@@ -22,7 +17,7 @@ class KDTreeDeletionTest {
             tree.delete(deleted);
             points.remove(deleted);
             assertContents(tree, points);
-            assertFalse(tree.search(deleted).isPresent());
+            Assertions.assertFalse(tree.search(deleted).isPresent());
         }
     }
 
@@ -35,7 +30,7 @@ class KDTreeDeletionTest {
             tree.delete(deleted);
             points.remove(deleted);
             assertContents(tree, points);
-            assertFalse(tree.search(deleted).isPresent());
+            Assertions.assertFalse(tree.search(deleted).isPresent());
         }
     }
 
@@ -46,7 +41,7 @@ class KDTreeDeletionTest {
         KDTree.Point deleted = points.removeFirst();
         tree.delete(deleted);
         assertContents(tree, points);
-        assertFalse(tree.search(deleted).isPresent());
+        Assertions.assertFalse(tree.search(deleted).isPresent());
         KDTree.Point inserted = pointOf(12);
         tree.insert(inserted);
         points.add(inserted);
@@ -63,29 +58,29 @@ class KDTreeDeletionTest {
         KDTree.Point deleted = points.removeFirst();
         tree.delete(deleted);
         assertContents(tree, points);
-        assertFalse(tree.search(deleted).isPresent());
+        Assertions.assertFalse(tree.search(deleted).isPresent());
         KDTree.Point successor = pointOf(25);
-        assertEquals(successor, tree.getRoot().getPoint());
+        Assertions.assertEquals(successor, tree.getRoot().getPoint());
         tree.delete(successor);
         points.remove(successor);
         assertContents(tree, points);
-        assertFalse(tree.search(successor).isPresent());
+        Assertions.assertFalse(tree.search(successor).isPresent());
     }
 
     @Test
     void deletingAbsentPointPreservesContents() {
         List<KDTree.Point> points = pointsOf(20, 10, 30);
         KDTree tree = insertedTree(points);
-        assertThrows(IllegalArgumentException.class, () -> tree.delete(pointOf(15)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> tree.delete(pointOf(15)));
         assertContents(tree, points);
         for (KDTree.Point point : List.copyOf(points)) {
             tree.delete(point);
             points.remove(point);
             assertContents(tree, points);
         }
-        assertNull(tree.getRoot());
-        assertThrows(IllegalArgumentException.class, () -> tree.delete(pointOf(20)));
-        assertNull(tree.getRoot());
+        Assertions.assertNull(tree.getRoot());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> tree.delete(pointOf(20)));
+        Assertions.assertNull(tree.getRoot());
     }
 
     @Test
@@ -95,7 +90,7 @@ class KDTreeDeletionTest {
             for (int index = 0; index < 15; index++) {
                 int[] coordinates = new int[dimension];
                 for (int axis = 0; axis < dimension; axis++) {
-                    coordinates[axis] = ((index * (axis + 1)) % 17) - 8;
+                    coordinates[axis] = index * (axis + 1) % 17 - 8;
                 }
                 initial.add(new KDTree.Point(coordinates));
             }
@@ -110,9 +105,9 @@ class KDTreeDeletionTest {
                         tree.delete(point);
                         remaining.remove(point);
                         assertContents(tree, remaining);
-                        assertFalse(tree.search(point).isPresent());
+                        Assertions.assertFalse(tree.search(point).isPresent());
                     }
-                    assertNull(tree.getRoot());
+                    Assertions.assertNull(tree.getRoot());
                 }
             }
         }
@@ -141,10 +136,10 @@ class KDTreeDeletionTest {
     private static void assertContents(KDTree tree, List<KDTree.Point> expected) {
         List<KDTree.Point> actual = new ArrayList<>();
         collectPoints(tree.getRoot(), actual);
-        assertEquals(expected.size(), actual.size());
-        assertEquals(Set.copyOf(expected), Set.copyOf(actual));
+        Assertions.assertEquals(expected.size(), actual.size());
+        Assertions.assertEquals(Set.copyOf(expected), Set.copyOf(actual));
         for (KDTree.Point point : expected) {
-            assertTrue(tree.search(point).isPresent(), () -> "Surviving point is unreachable: " + point);
+            Assertions.assertTrue(tree.search(point).isPresent(), () -> "Surviving point is unreachable: " + point);
         }
         if (!expected.isEmpty()) {
             for (int axis = 0; axis < expected.getFirst().getDimension(); axis++) {
@@ -154,8 +149,8 @@ class KDTreeDeletionTest {
                     minimum = Math.min(minimum, point.getCoordinate(axis));
                     maximum = Math.max(maximum, point.getCoordinate(axis));
                 }
-                assertEquals(minimum, tree.findMin(axis).getCoordinate(axis));
-                assertEquals(maximum, tree.findMax(axis).getCoordinate(axis));
+                Assertions.assertEquals(minimum, tree.findMin(axis).getCoordinate(axis));
+                Assertions.assertEquals(maximum, tree.findMax(axis).getCoordinate(axis));
             }
         }
     }

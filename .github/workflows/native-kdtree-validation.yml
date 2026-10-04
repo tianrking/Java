@@ -28,7 +28,7 @@ jobs:
           git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = f2bab248ff2861e40bf88a1f96dd3e64ae42e2e5
-          test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = dbc25c4af0843715d005306fc73f8214f222a537
+          test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = ee5d22f63b220168402196fccfa92db554a1b895
       - name: Native fixed KDTree regressions
         run: mvn --batch-mode -Dtest=KDTreeTest,KDTreeDeletionTest test
       - name: Full Maven verification
@@ -64,7 +64,7 @@ jobs:
           git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git hash-object src/main/java/com/thealgorithms/datastructures/trees/KDTree.java)" = f2bab248ff2861e40bf88a1f96dd3e64ae42e2e5
-          test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = dbc25c4af0843715d005306fc73f8214f222a537
+          test "$(git hash-object src/test/java/com/thealgorithms/datastructures/trees/KDTreeDeletionTest.java)" = ee5d22f63b220168402196fccfa92db554a1b895
           git diff --exit-code HEAD -- .
       - name: Save native test and quality reports
         if: always()
